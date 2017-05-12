@@ -14,18 +14,20 @@ public class GameManager : MonoBehaviour
     }
 
     public SpawnManager spawnManager;
-    
+
     public int stage;
     public int score;
     public float time;
 
-    private void Awake()
+    private void Start()
     {
         instance = this;
 
-        stage = 0;
+        stage = 1;
         time = 40;
         score = 0;
+
+        Spawn();
     }
 
     private void OnDestroy()
@@ -41,16 +43,24 @@ public class GameManager : MonoBehaviour
             time = 40;
 
             stage += 1;
+
+            Spawn();
+
+            GameMng.GetInstance.StageAni();
         }
+
+        GameMng.GetInstance.StageTime.text = ((int)time).ToString();
+        GameMng.GetInstance.StageShow.text = "STAGE " + stage.ToString();
+        GameMng.GetInstance.HPText.text = Player.GetInstance.health.ToString();
+        GameMng.GetInstance.MoneyText.text = Player.GetInstance.cash.ToString();
     }
 
-    public void StageStart()
+    private void Spawn()
     {
-
-    }
-
-    public void StageEnd()
-    {
-
+        for (int i = 0; i < 5 * stage; i++)
+        {
+            spawnManager.ZSpawn(stage);
+        }
+        spawnManager.ISpawn();
     }
 }

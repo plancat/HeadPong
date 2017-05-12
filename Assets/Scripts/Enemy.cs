@@ -9,6 +9,8 @@ public class Enemy : MonoBehaviour
     private CapsuleCollider collider;
     private NavMeshAgent agent;
 
+    private AudioSource hitSound;
+
     private bool IsAttack = false;
     private bool IsHit = false;
 
@@ -26,22 +28,25 @@ public class Enemy : MonoBehaviour
         anim = GetComponent<Animator>();
         agent = GetComponent<NavMeshAgent>();
         collider = GetComponent<CapsuleCollider>();
+        hitSound = GetComponent<AudioSource>();
+    }
+
+    public void Live()
+    {
+        agent.enabled = true;
+        collider.enabled = true;
+        anim.Play("Walk");
     }
 
     void Update()
     {
         if (!IsHit && health > 0)
         {
-            if (Player.GetInstance.health > 0)
-            {
-            }
-
             float dist = Vector3.Distance(transform.position, Player.GetInstance.transform.position);
-
-
-            if (dist < 1.5f)
+            
+            if (dist < 1.0f)
             {
-                agent.Stop();
+                agent.enabled = false;
                 if (!IsAttack)
                 {
                     IsAttack = true;
@@ -56,6 +61,7 @@ public class Enemy : MonoBehaviour
             }
             else
             {
+                agent.enabled = true;
                 agent.SetDestination(Player.GetInstance.gameObject.transform.position);
             }
         }
@@ -63,9 +69,14 @@ public class Enemy : MonoBehaviour
 
     public void Hit(Vector3 point)
     {
+        if (health <= 0)
+            return;
+
         IsHit = true;
 
-        agent.Stop();
+        agent.enabled = false;
+
+        hitSound.Play();
 
         StopCoroutine("HitDelay");
         StartCoroutine("HitDelay");
@@ -77,15 +88,22 @@ public class Enemy : MonoBehaviour
         health -= 1;
         if (health <= 0)
         {
+            Player.GetInstance.cash += 250;
             agent.enabled = false;
             collider.enabled = false;
-
             anim.SetTrigger("Dead");
+            StartCoroutine("DeathDelay");
         }
 
         GameObject h = Instantiate(bloodPrefab);
         h.transform.position = point;
         Destroy(h, 1.0f);
+    }
+
+    IEnumerator DeathDelay()
+    {
+        yield return new WaitForSeconds(5f);
+        gameObject.SetActive(false);
     }
 
     IEnumerator AttackDelay()
@@ -99,7 +117,7 @@ public class Enemy : MonoBehaviour
         yield return new WaitForSeconds(attackDamageDelay);
 
         float dist = Vector3.Distance(transform.position, Player.GetInstance.transform.position);
-        if (dist < 1.6f)
+        if (dist < 1.2f)
         {
             Player.GetInstance.Hit();
         }

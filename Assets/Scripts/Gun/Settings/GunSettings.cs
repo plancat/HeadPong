@@ -6,9 +6,7 @@ public class GunSettings
     [Header("Ammo")]
     public int curAmmo;
     public int maxAmmo;
-
-    private bool isNoAmmo = false;
-    private bool isRelease = false;
+    public int miAmmo;
 
     [Header("Fire Rate & Bullet Setting")]
     public bool isAutomaticFire = false;

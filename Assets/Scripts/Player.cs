@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -29,12 +30,16 @@ public class Player : MonoBehaviour
     private bool isHit = false;
     private bool isAiming = false;
 
+    public AudioSource hitSound;
+
     public Camera playerCamera;
     private CameraShaker cameraShaker;
 
     [HideInInspector]
     public ArmController armController;
     public Animator playerDeath;
+    [HideInInspector]
+    public UnityStandardAssets.Characters.FirstPerson.FirstPersonController fpController;
 
 
     private void Awake()
@@ -44,8 +49,14 @@ public class Player : MonoBehaviour
         gunType = GunType.HANDGUN;
 
         armController = GetComponent<ArmController>();
+        armController.armAnim.SetLayerWeight(1, 1);
+        armController.armAnim.SetLayerWeight(2, 0);
 
+        fpController = GetComponent<UnityStandardAssets.Characters.FirstPerson.FirstPersonController>();
         cameraShaker = playerCamera.GetComponent<CameraShaker>();
+
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void OnDestroy()
@@ -88,9 +99,14 @@ public class Player : MonoBehaviour
                 gunType = nextGunType;
 
                 if (gunType == GunType.GRENADE)
-                    armController.SwapWeapon(true);
+                    armController.SwapWeapon(0, true);
                 else
-                    armController.SwapWeapon(false);
+                {
+                    if(gunType == GunType.HANDGUN)
+                        armController.SwapWeapon(0, false);
+                    else
+                        armController.SwapWeapon(1, false);
+                }
             }
         }
     }
@@ -117,7 +133,10 @@ public class Player : MonoBehaviour
         else
             isAiming = false;
 
-        armController.armAnim.SetBool("isAiming", isAiming);
+        if(armController.isReload)
+            armController.armAnim.SetBool("isAiming", false);
+        else
+            armController.armAnim.SetBool("isAiming", isAiming);
     }
 
     void ReloadUpdate()
@@ -143,11 +162,14 @@ public class Player : MonoBehaviour
         {
             isHit = true;
 
+            hitSound.Play();
             health -= 25;
             if (health <= 0)
             {
-                playerDeath.Play("Death");
+                SceneManager.LoadScene("Death");
             }
+
+            GameMng.GetInstance.AttackDamege();
 
             StartCoroutine(HitDelay());
 

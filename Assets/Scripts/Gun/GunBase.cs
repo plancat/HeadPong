@@ -7,6 +7,8 @@ public class GunBase : MonoBehaviour
     public bool isShooting;
     public bool isRifle = false;
 
+    public int damage;
+
     [Header("Settings")]
     public GunSettings gunSettings;
     [Header("Reloade")]
@@ -40,12 +42,17 @@ public class GunBase : MonoBehaviour
 
             particleSettings.smokeParticles.Play();
             particleSettings.sparkParticles.Play();
-            particleSettings.bulletTracerParticles.Play();
 
             GunCasting();
 
             componentSettings.flashImageObject.SetActive(true);
         }
+    }
+
+    private void Update()
+    {
+        GameMng.GetInstance.BulletText.text = gunSettings.curAmmo.ToString();
+        GameMng.GetInstance.MaxBulletText.text = gunSettings.maxAmmo.ToString();
     }
 
     private IEnumerator ShootRate()
@@ -71,8 +78,17 @@ public class GunBase : MonoBehaviour
 
     private IEnumerator ReloadAmmo()
     {
-        yield return new WaitForSeconds(reloadSettings.enableBulletTime);
-        gunSettings.curAmmo = gunSettings.maxAmmo;
+        yield return new WaitForSeconds(2.6f);
+        if(gunSettings.maxAmmo >= gunSettings.miAmmo)
+        {
+            gunSettings.maxAmmo -= gunSettings.miAmmo;
+            gunSettings.curAmmo = gunSettings.miAmmo;
+        }
+        else
+        {
+            gunSettings.curAmmo = gunSettings.maxAmmo;
+            gunSettings.maxAmmo = 0;
+        }
     }
 
     // 총쏘기 전 우선 호출

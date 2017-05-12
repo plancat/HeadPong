@@ -13,12 +13,16 @@ public class GrenadeBase : MonoBehaviour
     public float hideDelay;
     public float showDelay;
 
-    bool isThrow = false;
+    public int cur = 3;
+
+    public bool isThrow = false;
 
     public void Throw()
     {
         if (!isThrow)
         {
+            cur -= 1;
+
             isThrow = true;
 
             StartCoroutine(GrenadeThrow());
@@ -26,15 +30,28 @@ public class GrenadeBase : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (cur <= 0)
+        {
+            currentGrenade.gameObject.SetActive(false);
+        }
+        else
+        {
+            currentGrenade.gameObject.SetActive(true);
+        }
+
+        GameMng.GetInstance.BulletText.text = cur.ToString();
+        GameMng.GetInstance.MaxBulletText.text = "3";
+    }
+
     IEnumerator GrenadeThrow()
     {
         yield return new WaitForSeconds(throwDelay);
-        isThrow = false;
 
-        GameObject tempGrenade = Instantiate(grenadePrefab,
-            currentGrenade.transform.position,
-            currentGrenade.transform.rotation);
-
+        GameObject tempGrenade = Instantiate(grenadePrefab);
+        tempGrenade.transform.position = currentGrenade.transform.position;
+        tempGrenade.transform.GetComponent<Rigidbody>().velocity = Player.GetInstance.playerCamera.transform.forward * 10;
         tempGrenade.transform.localScale = Vector3.one;
         tempGrenade.SetActive(true);
     }
@@ -46,5 +63,8 @@ public class GrenadeBase : MonoBehaviour
 
         yield return new WaitForSeconds(showDelay);
         currentGrenade.SetActive(true);
+
+        yield return new WaitForSeconds(0.5f);
+        isThrow = false;
     }
 }
