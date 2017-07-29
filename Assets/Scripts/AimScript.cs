@@ -38,10 +38,9 @@ public class AimScript : MonoBehaviour
                                                zoomFov, fovSpeed * Time.deltaTime);
             if (!soundHasPlayed)
             {
-                aimSound.Play();
+                // aimSound.Play();
                 soundHasPlayed = true;
             }
-
         }
         else
         {
@@ -50,9 +49,9 @@ public class AimScript : MonoBehaviour
             gunCamera.fieldOfView = Mathf.Lerp(gunCamera.fieldOfView,
                                                defaultFov, fovSpeed * Time.deltaTime);
 
-            soundHasPlayed = false;
         }
 
+        soundHasPlayed = false;
         mouseX = Input.GetAxis("Mouse X");
         mouseY = Input.GetAxis("Mouse Y");
 

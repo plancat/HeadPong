@@ -21,11 +21,11 @@ public class SpawnManager : MonoBehaviour
         if (z != null)
         {
             if (zIdx == 1)
-                z.GetComponent<Enemy>().health = 2 + stage;
+                z.GetComponent<Enemy>().health = 1 + stage;
             else if (zIdx == 2)
                 z.GetComponent<Enemy>().health = stage;
             else
-                z.GetComponent<Enemy>().health = 3 + stage;
+                z.GetComponent<Enemy>().health = 2 + stage;
 
             z.GetComponent<Enemy>().Live();
             z.transform.position = position.position;

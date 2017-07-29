@@ -20,7 +20,7 @@ public class TutorialScene : MonoBehaviour
         timeScale -= Time.deltaTime;
         if (timeScale <= 0)
         {
-            SceneManager.LoadScene("Demo");
+            SceneManager.LoadScene("Play");
         }
         time.text = ((int)timeScale).ToString();
     }

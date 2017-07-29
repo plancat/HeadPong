@@ -13,7 +13,7 @@ public class DeathScene : MonoBehaviour
 
     public void ReplayButton()
     {
-        SceneManager.LoadScene("Demo");
+        SceneManager.LoadScene("Play");
     }
 
     public void MainButton()
